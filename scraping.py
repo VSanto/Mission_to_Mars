@@ -1,6 +1,3 @@
-# Import Pandas
-import pandas as pd
-
 # Import Splinter and BeautifulSoup
 from splinter import Browser
 from bs4 import BeautifulSoup as soup
@@ -8,9 +5,11 @@ import pandas as pd
 import datetime as dt
 from webdriver_manager.chrome import ChromeDriverManager
 
-# Set up Splinter
-executable_path = {'executable_path': ChromeDriverManager().install()}
-browser = Browser('chrome', **executable_path, headless=False)
+# # Set up Splinter
+# executable_path = {'executable_path': ChromeDriverManager().install()}
+# browser = Browser('chrome', **executable_path, headless=False)
+
+
 
 def scrape_all():
     # Initiate headless driver for deployment
@@ -100,6 +99,4 @@ def mars_facts():
     # Convert dataframe into HTML format, add bootstrap
     return df.to_html()
 
-if __name__ == "__main__":
-    # If running as script, print scraped data
-    print(scrape_all())
+

@@ -14,6 +14,7 @@ def scrape_all():
     executable_path = {'executable_path': ChromeDriverManager().install()}
     browser = Browser('chrome', **executable_path, headless=True)
     
+    # hemisphere_image_urls = hemispheres(browser)
     news_title, news_paragraph = mars_news(browser)
 
 # Run all scraping functions and store results in dictionary
@@ -22,8 +23,9 @@ def scrape_all():
       "news_paragraph": news_paragraph,
       "featured_image": featured_image(browser),
       "facts": mars_facts(),
+      "hemispheres": hemispheres(browser),
       "last_modified": dt.datetime.now()
-}
+    }
  # Stop webdriver and return data
     browser.quit()
     return data
@@ -57,10 +59,11 @@ def mars_news(browser):
 
 def featured_image(browser):
     # Visit URL
-    url = 'https://spaceimages-mars.com'
+    url = 'https://www.spaceimages-mars.com'
     browser.visit(url)
 
     # Find and click the full image button
+    # full_image_elem = browser.find_by_tag('full_image')[0]
     full_image_elem = browser.find_by_tag('button')[1]
     full_image_elem.click()
 
@@ -86,7 +89,7 @@ def mars_facts():
     try:
         # Use 'read_html' to scrape the facts table into a dataframe
         df = pd.read_html('https://galaxyfacts-mars.com')[0]
-
+       
     except BaseException:
         return None
 
@@ -97,4 +100,52 @@ def mars_facts():
     # Convert dataframe into HTML format, add bootstrap
     return df.to_html()
 
+# hemisphere function
+def hemispheres(browser):
+    # 1. Use browser to visit the URL 
+    url='https://marshemispheres.com/'
+    # url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    browser.visit(url+ 'index.html')
+
+# 2. Create a list to hold the images and titles.
+    hemisphere_image_urls = []
+
+# 3. Write code to retrieve the image urls and titles for each hemisphere.
+    for i in range(4):
+    # Create Dictionary
+        # hemispheres = {}
+        browser.find_by_css('a.product-item img')[i].click()
+        # browser.find_by_css('a.product-item h3')[i].click()
+        hemi_data = scrape_hemisphere(browser.html)
+        hemi_data['img_url']= url +hemi_data['img_url']
+        hemisphere_image_urls.append(hemi_data)
+
+        browser.back()
+    return hemisphere_image_urls
+
+def scrape_hemisphere(html_text):
+    hemi_soup = soup(html_text, "html.parser")
+
+    try:
+        element = hemi_soup.find('a', text='Sample').get('href')
+        # img_url = element['href']
+        title = hemi_soup.find('h2', class_='title').get_text()
+    except:
+        None
+        
+    hemispheres ={
+        "title":title,
+        "img_url":element
+    }
+    return hemispheres
+
+    # 4. Print the list that holds the dictionary of each image url and title.
+    # hemisphere_image_urls
+
+# 5. Quit the browser
+if __name__ =="__main__":
+    print(scrape_all())
+
+# 5. Quit the browser
+# browser.quit()
 
